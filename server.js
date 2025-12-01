@@ -97,50 +97,24 @@ app.post('/api/generate', (req, res) => {
     });
   }
 
-  let code = null;
-  let attempts = 0;
-  const maxAttempts = 100;
+  // Generate code without storage - infinite generation enabled
+  const charset = type === 'alphabetic'
+    ? voucher_codes.charset('alphabetic')
+    : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // uppercase alphanumeric
 
-  // Generate codes until we get a unique one
-  while (!code && attempts < maxAttempts) {
-    const charset = type === 'alphabetic'
-      ? voucher_codes.charset('alphabetic')
-      : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; // uppercase alphanumeric
+  const generated = voucher_codes.generate({
+    length: 7,
+    count: 1,
+    charset: charset
+  });
 
-    const generated = voucher_codes.generate({
-      length: 7,
-      count: 1,
-      charset: charset
-    });
+  const code = generated[0].toUpperCase(); // Ensure uppercase
 
-    const candidate = generated[0].toUpperCase(); // Ensure uppercase
-
-    if (!generatedCodesSet.has(candidate)) {
-      // Try to save to file
-      const saveResult = saveCodeToFile(candidate, type);
-      if (saveResult.success) {
-        code = candidate;
-        generatedCodesSet.add(code);
-      } else if (saveResult.isDuplicate) {
-        // File check found duplicate, add to set and retry
-        generatedCodesSet.add(candidate);
-      }
-    }
-
-    attempts++;
-  }
-
-  if (!code) {
-    return res.status(500).json({
-      error: 'Failed to generate a unique code after 100 attempts.'
-    });
-  }
-
-  const allCodes = getAllCodes();
   res.json({
     code: code,
     type: type,
-    totalGenerated: allCodes.length
+    totalGenerated: generatedCodesSet.size,
+    message: 'Storage disabled - codes are not persisted'
   });
 });
 
