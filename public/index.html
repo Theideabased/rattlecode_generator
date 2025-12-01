@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indomie Raffle Code Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .type-selector {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    label {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    select:hover,
+    select:focus {
+      border-color: #667eea;
+      outline: none;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+
+    .btn-generate {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      flex: 2;
+      min-width: 150px;
+    }
+
+    .btn-generate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    .btn-reset {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .btn-reset:hover {
+      background: #ff5252;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    .btn-reset:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .status.error {
+      background: #ffe0e0;
+      border-left-color: #ff6b6b;
+      color: #cc0000;
+    }
+
+    .status.success {
+      background: #e0ffe0;
+      border-left-color: #51cf66;
+      color: #2f8a2f;
+    }
+
+    .codes-section {
+      margin-top: 30px;
+    }
+
+    .codes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .codes-header h2 {
+      color: #333;
+      font-size: 18px;
+    }
+
+    .code-count {
+      background: #667eea;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .codes-list {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .code-item {
+      background: white;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 3px solid #667eea;
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .code-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .code-item .code {
+      color: #333;
+      letter-spacing: 1px;
+    }
+
+    .code-item .type {
+      background: #e9ecef;
+      color: #666;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .code-item .type.alphabetic {
+      background: #d0ebff;
+      color: #1971c2;
+    }
+
+    .code-item .type.alphanumeric {
+      background: #d3f9d8;
+      color: #2f9e44;
+    }
+
+    .empty-message {
+      color: #999;
+      text-align: center;
+      padding: 30px;
+      font-size: 14px;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .continuous-section {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .continuous-section h3 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .continuous-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .batch-input {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .batch-input input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .batch-input input:hover,
+    .batch-input input:focus {
+      border-color: #667eea;
+      outline: none;
+    }
+
+    .btn-start-continuous {
+      background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+      color: white;
+    }
+
+    .btn-start-continuous:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(81, 207, 102, 0.4);
+    }
+
+    .btn-stop-continuous {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .btn-stop-continuous:hover {
+      background: #ff5252;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    .continuous-stats {
+      background: white;
+      border-left: 4px solid #667eea;
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-top: 15px;
+      font-size: 14px;
+      color: #333;
+      display: none;
+    }
+
+    .continuous-stats.active {
+      display: block;
+    }
+
+    .stat-item {
+      display: inline-block;
+      margin-right: 20px;
+    }
+
+    .stat-label {
+      font-weight: 600;
+      color: #666;
+    }
+
+    .stat-value {
+      color: #667eea;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎰 Raffle Code Generator</h1>
+    <p class="subtitle">Generate unique 7-character codes for your raffle draw</p>
+
+    <!-- Status Message -->
+    <div id="status" class="status" style="display: none;"></div>
+
+    <!-- Single Code Generation -->
+    <div class="controls">
+      <div class="type-selector">
+        <label for="codeType">Code Type:</label>
+        <select id="codeType">
+          <option value="alphanumeric">AlphaNumeric (A-Z + 0-9)</option>
+          <option value="alphabetic">Alphabetic (A-Z Only)</option>
+        </select>
+      </div>
+      <div class="button-group">
+        <button class="btn-generate" onclick="generateCode()">Generate Code</button>
+        <button class="btn-reset" onclick="resetCodes()">Reset List</button>
+      </div>
+    </div>
+
+    <!-- Continuous Generation Section -->
+    <div class="continuous-section">
+      <h3>🔄 Continuous Generation</h3>
+      <div class="continuous-controls">
+        <div class="batch-input">
+          <label for="batchCount">How many codes:</label>
+          <input type="number" id="batchCount" min="1" max="10000" value="100" />
+        </div>
+        <button class="btn-generate btn-start-continuous" id="btnStartContinuous" onclick="startContinuousGeneration()">
+          Generate Batch
+        </button>
+        <button class="btn-stop-continuous" id="btnStopContinuous" onclick="stopContinuousGeneration()" style="display: none;">
+          Stop Generation
+        </button>
+      </div>
+      <div class="continuous-stats" id="continuousStats">
+        <div class="stat-item">
+          <span class="stat-label">Generated:</span>
+          <span class="stat-value" id="statGenerated">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Remaining:</span>
+          <span class="stat-value" id="statRemaining">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Speed:</span>
+          <span class="stat-value" id="statSpeed">0/s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <span>Generating...</span>
+    </div>
+
+    <!-- Codes List -->
+    <div class="codes-section">
+      <div class="codes-header">
+        <h2>Generated Codes</h2>
+        <span class="code-count" id="codeCount">0</span>
+      </div>
+      <div class="codes-list" id="codesList">
+        <div class="empty-message">No codes generated yet. Start by clicking "Generate Code".</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let codesList = [];
+    let isContinuousRunning = false;
+    let continuousStartTime = 0;
+    let continuousGenerated = 0;
+    let continuousTarget = 0;
+
+    /**
+     * Fetch generated codes from the server.
+     */
+    async function fetchCodes() {
+      try {
+        const response = await fetch('/api/codes');
+        if (!response.ok) throw new Error('Failed to fetch codes');
+        const data = await response.json();
+        codesList = data.codes || [];
+        renderCodes();
+      } catch (error) {
+        showStatus('Error fetching codes: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * Generate a single new code.
+     */
+    async function generateCode() {
+      const type = document.getElementById('codeType').value;
+      const loading = document.getElementById('loading');
+      const btn = document.querySelector('.btn-generate:not(.btn-start-continuous)');
+
+      loading.style.display = 'block';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: type })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error || 'Failed to generate code');
+        }
+
+        const data = await response.json();
+        codesList.push({ code: data.code, type: data.type });
+        renderCodes();
+        showStatus(`✓ Code generated: ${data.code}`, 'success');
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+      } finally {
+        loading.style.display = 'none';
+        btn.disabled = false;
+      }
+    }
+
+    /**
+     * Start continuous code generation.
+     */
+    async function startContinuousGeneration() {
+      const batchCount = parseInt(document.getElementById('batchCount').value) || 100;
+
+      if (batchCount < 1 || batchCount > 10000) {
+        showStatus('Batch count must be between 1 and 10,000', 'error');
+        return;
+      }
+
+      isContinuousRunning = true;
+      continuousTarget = batchCount;
+      continuousGenerated = 0;
+      continuousStartTime = Date.now();
+
+      const btnStart = document.getElementById('btnStartContinuous');
+      const btnStop = document.getElementById('btnStopContinuous');
+      const stats = document.getElementById('continuousStats');
+
+      btnStart.style.display = 'none';
+      btnStart.disabled = true;
+      btnStop.style.display = 'inline-block';
+      btnStop.disabled = false;
+      stats.classList.add('active');
+
+      showStatus(`🚀 Generating ${batchCount} codes...`, 'success');
+
+      const type = document.getElementById('codeType').value;
+
+      while (isContinuousRunning && continuousGenerated < continuousTarget) {
+        try {
+          const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: type })
+          });
+
+          if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to generate code');
+          }
+
+          const data = await response.json();
+          codesList.push({ code: data.code, type: data.type });
+          continuousGenerated++;
+
+          // Update stats every 10 codes for performance
+          if (continuousGenerated % 10 === 0) {
+            renderCodes();
+            updateContinuousStats();
+          }
+
+          // Small delay to avoid overwhelming the server
+          await new Promise(resolve => setTimeout(resolve, 10));
+        } catch (error) {
+          showStatus(`Error at code ${continuousGenerated + 1}: ${error.message}`, 'error');
+          break;
+        }
+      }
+
+      if (isContinuousRunning) {
+        renderCodes();
+        updateContinuousStats();
+        showStatus(`✅ Batch complete! Generated ${continuousGenerated} codes.`, 'success');
+      }
+
+      isContinuousRunning = false;
+      btnStart.style.display = 'inline-block';
+      btnStart.disabled = false;
+      btnStop.style.display = 'none';
+      btnStop.disabled = true;
+      stats.classList.remove('active');
+    }
+
+    /**
+     * Stop continuous generation.
+     */
+    function stopContinuousGeneration() {
+      isContinuousRunning = false;
+      showStatus('⏹ Generation stopped.', 'info');
+    }
+
+    /**
+     * Update continuous generation stats.
+     */
+    function updateContinuousStats() {
+      const elapsed = (Date.now() - continuousStartTime) / 1000; // seconds
+      const speed = elapsed > 0 ? (continuousGenerated / elapsed).toFixed(1) : 0;
+      const remaining = continuousTarget - continuousGenerated;
+
+      document.getElementById('statGenerated').textContent = continuousGenerated;
+      document.getElementById('statRemaining').textContent = remaining;
+      document.getElementById('statSpeed').textContent = speed + '/s';
+    }
+
+    /**
+     * Reset all codes.
+     */
+    async function resetCodes() {
+      if (!confirm('Are you sure you want to clear all codes?')) return;
+
+      try {
+        const response = await fetch('/api/reset', { method: 'POST' });
+        if (!response.ok) throw new Error('Failed to reset codes');
+
+        codesList = [];
+        renderCodes();
+        showStatus('✓ All codes cleared', 'success');
+      } catch (error) {
+        showStatus('Error: ' + error.message, 'error');
+      }
+    }
+
+    /**
+     * Render the codes list.
+     */
+    function renderCodes() {
+      const list = document.getElementById('codesList');
+      const count = document.getElementById('codeCount');
+
+      count.textContent = codesList.length;
+
+      if (codesList.length === 0) {
+        list.innerHTML = '<div class="empty-message">No codes generated yet. Start by clicking "Generate Code" or "Generate Batch".</div>';
+        return;
+      }
+
+      // Only render the last 100 codes for performance with large batches
+      const visibleCodes = codesList.slice(-100);
+      list.innerHTML = visibleCodes
+        .map(
+          (item) => `
+            <div class="code-item">
+              <span class="code">${item.code}</span>
+              <span class="type ${item.type}">${item.type}</span>
+            </div>
+          `
+        )
+        .join('');
+
+      // Add "showing" message if truncated
+      if (codesList.length > 100) {
+        list.innerHTML += `<div class="empty-message" style="padding: 10px; margin-top: 10px; color: #999;">Showing last 100 codes of ${codesList.length} total</div>`;
+      }
+    }
+
+    /**
+     * Show a status message.
+     */
+    function showStatus(message, type = 'info') {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = 'status ' + type;
+      status.style.display = 'block';
+
+      if (type === 'success' || type === 'error') {
+        setTimeout(() => {
+          status.style.display = 'none';
+        }, 5000);
+      }
+    }
+
+    // Load codes on page load
+    window.addEventListener('DOMContentLoaded', fetchCodes);
+  </script>
+</body>
+</html>
